@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: reqs
+Version: 0.1.0
+Summary: Requirements prioritization and traceability decision-support system
+Requires-Python: >=3.11
+Requires-Dist: fastapi<1.0,>=0.115
+Requires-Dist: sqlalchemy<3.0,>=2.0
+Requires-Dist: psycopg[binary]<4.0,>=3.2
+Provides-Extra: dev
+Requires-Dist: pytest<9.0,>=8.0; extra == "dev"
