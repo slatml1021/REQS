@@ -10,7 +10,7 @@
 
 ## Tamamlanan işler
 
-1. Başlangıç aşamasının literatür sentezi, kavramsal çerçevesi ve örnek gereksinim listesi tamamlandı.
+1. Başlangıç aşamasının ön literatür sentezi, kavramsal çerçevesi ve örnek gereksinim listesi tamamlandı. Nihai tez kaynakçası yalnızca indirilen/yasal tam metni doğrulanmış yayınlardan oluşturulacaktır.
 2. Proje temeli oluşturuldu: Python paket yapısı, paket tanımı ve test çalışma düzeni eklendi.
 3. PostgreSQL 16 geliştirme servisi `docker-compose.yml` içinde tanımlandı. Servis; kalıcı veri alanı, sağlık kontrolü ve yerel 5432 portu ile yapılandırıldı.
 4. SQLAlchemy 2.0 veri modeli tamamlandı:
