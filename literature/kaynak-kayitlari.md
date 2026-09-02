@@ -1,6 +1,6 @@
 # Tam metin kaynak kayıtları — 15/15
 
-Bu listedeki her kaydın tam metin PDF'si `full_text/` klasörüne yasal açık erişim kaynağından indirildi. Tez yazımında yalnızca bu listedeki yayınlar kullanılacaktır. ArXiv kayıtları yazarların açık erişime sunduğu ön baskı/sürüm kopyalarıdır; yayımlanmış sürümü bulunanlarda tez kaynakçasında DOI ve yayınevi künyesi ayrıca doğrulanacaktır.
+Bu listedeki her kaydın tam metin PDF'si `full_text/` klasörüne yasal açık erişim kaynağından indirildi ve dosya açılabilirliği doğrulandı. ArXiv kayıtları yazarların açık erişime sunduğu ön baskı/sürüm kopyalarıdır; yayımlanmış sürümü bulunanlarda tez kaynakçasında DOI ve yayınevi künyesi ayrıca doğrulanacaktır. **İndirilmiş olmak, tek başına analizin tamamlandığı veya her yayının ana kaynak olduğu anlamına gelmez.**
 
 | No | Künye / yayın türü | Açık erişim adresi | Yerel PDF |
 |---:|---|---|---|
@@ -17,8 +17,14 @@ Bu listedeki her kaydın tam metin PDF'si `full_text/` klasörüne yasal açık 
 | 11 | Cleland-Huang, J. et al. (2007). *Pre-Requirement Specification Traceability: Bridging the Complexity Gap through Capabilities*. | [arXiv PDF](https://arxiv.org/pdf/cs/0703012) | `cleland-huang-2007-pre-requirement-traceability.pdf` |
 | 12 | Frattini, J. et al. (2023). *Requirements Quality Research: a Harmonized Theory, Evaluation, and Roadmap*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/2309.10355) | `frattini-2023-requirements-quality-roadmap.pdf` |
 | 13 | Mahmoud, A. et al. (2024). *Assisted Requirements Selection by Clustering*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/2401.12634) | `mahmoud-2024-assisted-requirements-selection.pdf` |
-| 14 | Sayyad, A. S., & Menzies, T. (2017). *A Thematic Study of Requirements Modeling and Analysis for Self-Adaptive Systems*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/1704.00420) | `sayyad-2017-requirements-self-adaptive-thematic-study.pdf` |
-| 15 | Sayyad, A. S., & Menzies, T. (2017). *Review on Requirements Modeling and Analysis for Self-Adaptive Systems: A Ten-Year Perspective*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/1704.00421) | `sayyad-2017-requirements-self-adaptive-review.pdf` |
+| 14 | Yang, Z., Li, Z., & Jin, Z. (2017). *A Thematic Study of Requirements Modeling and Analysis for Self-Adaptive Systems*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/1704.00420) | `yang-2017-requirements-self-adaptive-thematic-study.pdf` |
+| 15 | Yang, Z., Li, Z., & Jin, Z. (2017). *Review on Requirements Modeling and Analysis for Self-Adaptive Systems: A Ten-Year Perspective*. Ön baskı. | [arXiv PDF](https://arxiv.org/pdf/1704.00421) | `yang-2017-requirements-self-adaptive-review.pdf` |
+
+## Uygunluk denetimi
+
+- **Ana kaynak adayı:** 1–9, 11–13. Bunlar gereksinim önceliklendirmesi, izlenebilirlik, ilişki/bağ kurtarma veya gereksinim seçimi ile doğrudan ilişkilidir.
+- **Kuramsal destek:** 10 numara, gereksinim kavramı ve tanım kalitesi tartışması için uygundur.
+- **İkincil/bağlamsal destek:** 14–15, öz-uyarlamalı sistemlerde gereksinim modelleme bağlamı içindir; REQS’in ana problemine doğrudan kaynak olarak kullanılmayacaktır.
 
 ## Okuma ve analiz kuralı
 
