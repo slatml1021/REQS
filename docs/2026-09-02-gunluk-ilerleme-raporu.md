@@ -6,23 +6,24 @@
 
 ## Günlük hedef
 
-Görev dağılımındaki 2 Eylül sorumlulukları doğrultusunda PostgreSQL geliştirme ortamının tanımlanması ve gereksinim, ilişki, puanlama varlıkları için SQLAlchemy veri katmanının hazırlanması hedeflendi.
+30 Ağustos–1 Eylül görevleri daha önce yapılmadığından önce literatür notları, kavramsal çerçeve, örnek gereksinim listesi ve veri taslağı tamamlandı. Ardından 2 Eylül sorumlulukları doğrultusunda PostgreSQL geliştirme ortamı ve SQLAlchemy veri katmanı hazırlandı.
 
 ## Tamamlanan işler
 
-1. Proje temeli oluşturuldu: Python paket yapısı, paket tanımı ve test çalışma düzeni eklendi.
-2. PostgreSQL 16 geliştirme servisi `docker-compose.yml` içinde tanımlandı. Servis; kalıcı veri alanı, sağlık kontrolü ve yerel 5432 portu ile yapılandırıldı.
-3. SQLAlchemy 2.0 veri modeli tamamlandı:
+1. Başlangıç aşamasının literatür sentezi, kavramsal çerçevesi ve örnek gereksinim listesi tamamlandı.
+2. Proje temeli oluşturuldu: Python paket yapısı, paket tanımı ve test çalışma düzeni eklendi.
+3. PostgreSQL 16 geliştirme servisi `docker-compose.yml` içinde tanımlandı. Servis; kalıcı veri alanı, sağlık kontrolü ve yerel 5432 portu ile yapılandırıldı.
+4. SQLAlchemy 2.0 veri modeli tamamlandı:
    - `Requirement`: benzersiz gereksinim anahtarı, başlık, açıklama, durum ve zaman damgaları.
    - `RequirementRelation`: gereksinimler arası yönlü izlenebilirlik bağlantısı; bağımlılık, ön koşul, ayrıntılandırma ve ilişki türleri.
    - `PriorityScore`: AHP, Wiegers ve Volere sonuçları için ham skor, 0–100 normalize skor ve yönteme özgü giriş verileri.
-4. Veri bütünlüğü kuralları eklendi:
+5. Veri bütünlüğü kuralları eklendi:
    - Aynı gereksinim anahtarı tekrar edemez.
    - Bir gereksinim kendisiyle ilişkilendirilemez.
    - Aynı kaynak–hedef–ilişki türü üçlüsü tekrar edemez.
    - Her gereksinimin her yöntem için yalnızca tek puan kaydı olur.
    - Normalize puan 0–100 aralığında tutulur.
-5. Model testleri yazıldı ve başarıyla çalıştırıldı: **2/2 test geçti**.
+6. Model testleri yazıldı ve başarıyla çalıştırıldı: **2/2 test geçti**.
 
 ## Teknik doğrulama
 
