@@ -16,3 +16,12 @@ class Base(DeclarativeBase):
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+
+def get_db():
+    """Provide one transactional database session per API request."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
