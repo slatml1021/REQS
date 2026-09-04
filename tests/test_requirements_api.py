@@ -50,3 +50,15 @@ def test_duplicate_requirement_key_is_rejected():
     payload = {"key": "REQ-001", "title": "Kullanıcı girişi"}
     assert client.post("/api/v1/requirements", json=payload).status_code == 201
     assert client.post("/api/v1/requirements", json=payload).status_code == 409
+
+
+def test_ahp_screen_renders_requirement_choices():
+    client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"})
+    client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"})
+
+    response = client.get("/ahp/comparisons")
+
+    assert response.status_code == 200
+    assert "AHP ikili karşılaştırma" in response.text
+    assert "REQ-001 — Kullanıcı girişi" in response.text
+    assert "REQ-002 — Rapor üretimi" in response.text
