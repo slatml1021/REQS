@@ -62,3 +62,31 @@ def test_ahp_screen_renders_requirement_choices():
     assert "AHP ikili karşılaştırma" in response.text
     assert "REQ-001 — Kullanıcı girişi" in response.text
     assert "REQ-002 — Rapor üretimi" in response.text
+
+
+def test_ahp_comparison_is_saved_once_per_requirement_pair():
+    left_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    right_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"}).json()["id"]
+
+    saved = client.put(
+        "/api/v1/ahp/comparisons",
+        json={"left_requirement_id": left_id, "right_requirement_id": right_id, "comparison_value": "5"},
+    )
+    updated_inverse = client.put(
+        "/api/v1/ahp/comparisons",
+        json={"left_requirement_id": right_id, "right_requirement_id": left_id, "comparison_value": "1/3"},
+    )
+
+    assert saved.status_code == 200
+    assert updated_inverse.status_code == 200
+    assert len(client.get("/api/v1/ahp/comparisons").json()) == 1
+    assert updated_inverse.json()["comparison_value"] == "3.00000000"
+
+
+def test_ahp_comparison_rejects_same_requirement():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    response = client.put(
+        "/api/v1/ahp/comparisons",
+        json={"left_requirement_id": requirement_id, "right_requirement_id": requirement_id, "comparison_value": "1"},
+    )
+    assert response.status_code == 422

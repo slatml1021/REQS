@@ -8,12 +8,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.requirements import router as requirements_router
+from app.api.ahp import router as ahp_router
 from app.database import get_db
 from app.models import Requirement
 
 
 app = FastAPI(title="REQS API", version="0.1.0")
 app.include_router(requirements_router, prefix="/api/v1")
+app.include_router(ahp_router, prefix="/api/v1")
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
