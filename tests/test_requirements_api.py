@@ -90,3 +90,25 @@ def test_ahp_comparison_rejects_same_requirement():
         json={"left_requirement_id": requirement_id, "right_requirement_id": requirement_id, "comparison_value": "1"},
     )
     assert response.status_code == 422
+
+
+def test_ahp_comparison_rejects_invalid_scale_for_existing_requirements():
+    left_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    right_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"}).json()["id"]
+
+    response = client.put(
+        "/api/v1/ahp/comparisons",
+        json={"left_requirement_id": left_id, "right_requirement_id": right_id, "comparison_value": "10"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_ahp_comparison_rejects_missing_requirement():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    response = client.put(
+        "/api/v1/ahp/comparisons",
+        json={"left_requirement_id": requirement_id, "right_requirement_id": 99, "comparison_value": "3"},
+    )
+
+    assert response.status_code == 404

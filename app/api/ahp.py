@@ -26,16 +26,16 @@ def _parse_saaty_value(raw_value: str) -> Decimal:
         else:
             value = Decimal(raw_value)
     except (InvalidOperation, ValueError, ZeroDivisionError) as error:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid Saaty value") from error
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid Saaty value") from error
     if value not in SAATY_VALUES:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Saaty value must be between 1/9 and 9")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Saaty value must be between 1/9 and 9")
     return value
 
 
 @router.put("", response_model=AhpComparisonRead)
 def save_comparison(payload: AhpComparisonWrite, db: Session = Depends(get_db)) -> AhpComparison:
     if payload.left_requirement_id == payload.right_requirement_id:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Requirements must be different")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Requirements must be different")
 
     required_ids = {payload.left_requirement_id, payload.right_requirement_id}
     found_ids = set(db.scalars(select(Requirement.id).where(Requirement.id.in_(required_ids))))

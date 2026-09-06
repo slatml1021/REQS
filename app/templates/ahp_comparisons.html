@@ -95,14 +95,19 @@
             status.textContent = "Farklı iki gereksinim seçmelisin.";
             return;
           }
-          const response = await fetch("/api/v1/ahp/comparisons", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const result = await response.json();
-          status.className = response.ok ? "mt-3 small text-success" : "mt-3 small text-danger";
-          status.textContent = response.ok ? "Karşılaştırma kaydedildi." : (result.detail || "Kaydetme sırasında hata oluştu.");
+          try {
+            const response = await fetch("/api/v1/ahp/comparisons", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+            status.className = response.ok ? "mt-3 small text-success" : "mt-3 small text-danger";
+            status.textContent = response.ok ? "Karşılaştırma kaydedildi." : (result.detail || "Kaydetme sırasında hata oluştu.");
+          } catch (_) {
+            status.className = "mt-3 small text-danger";
+            status.textContent = "Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar dene.";
+          }
         });
       }
     </script>
