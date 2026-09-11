@@ -64,6 +64,17 @@ def test_ahp_screen_renders_requirement_choices():
     assert "REQ-002 — Rapor üretimi" in response.text
 
 
+def test_volere_screen_renders_criteria_and_requirement_choice():
+    client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"})
+
+    response = client.get("/volere/scoring")
+
+    assert response.status_code == 200
+    assert "Volere kriter ve puanlama" in response.text
+    assert "Müşteri değeri" in response.text
+    assert "REQ-001 — Kullanıcı girişi" in response.text
+
+
 def test_ahp_comparison_is_saved_once_per_requirement_pair():
     left_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     right_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"}).json()["id"]

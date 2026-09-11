@@ -25,3 +25,10 @@ def ahp_comparisons(request: Request, db: Session = Depends(get_db)):
     """Render the first AHP pairwise-comparison input screen."""
     requirements = list(db.scalars(select(Requirement).order_by(Requirement.key)))
     return templates.TemplateResponse(request, "ahp_comparisons.html", {"requirements": requirements})
+
+
+@app.get("/volere/scoring")
+def volere_scoring(request: Request, db: Session = Depends(get_db)):
+    """Render the initial Volere criteria and scoring screen."""
+    requirements = list(db.scalars(select(Requirement).order_by(Requirement.key)))
+    return templates.TemplateResponse(request, "volere_scoring.html", {"requirements": requirements})
