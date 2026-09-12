@@ -75,6 +75,38 @@ def test_volere_screen_renders_criteria_and_requirement_choice():
     assert "REQ-001 — Kullanıcı girişi" in response.text
 
 
+def test_volere_score_is_calculated_and_updated():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    payload = {
+        "requirement_id": requirement_id,
+        "criteria": [
+            {"name": "Müşteri değeri", "weight": 40, "score": 10},
+            {"name": "İş değeri", "weight": 30, "score": 8},
+            {"name": "Uygulama kolaylığı", "weight": 20, "score": 5},
+            {"name": "Maliyet avantajı", "weight": 10, "score": 0},
+        ],
+    }
+
+    saved = client.put("/api/v1/volere/scores", json=payload)
+    payload["criteria"][0]["score"] = 5
+    updated = client.put("/api/v1/volere/scores", json=payload)
+
+    assert saved.status_code == 200
+    assert saved.json()["raw_score"] == "7.4000"
+    assert saved.json()["normalized_score"] == "74.00"
+    assert updated.status_code == 200
+    assert updated.json()["normalized_score"] == "54.00"
+
+
+def test_volere_score_requires_weights_to_total_one_hundred():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    response = client.put(
+        "/api/v1/volere/scores",
+        json={"requirement_id": requirement_id, "criteria": [{"name": "Değer", "weight": 90, "score": 8}]},
+    )
+    assert response.status_code == 422
+
+
 def test_ahp_comparison_is_saved_once_per_requirement_pair():
     left_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     right_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"}).json()["id"]

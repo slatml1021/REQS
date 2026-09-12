@@ -26,7 +26,7 @@
       {% if requirements|length == 0 %}
       <div class="alert alert-info" role="alert">Puanlama için önce en az bir gereksinim oluştur.</div>
       {% else %}
-      <form class="card border-0 shadow-sm" aria-label="Volere puanlama formu">
+      <form id="volere-form" class="card border-0 shadow-sm" aria-label="Volere puanlama formu">
         <div class="card-body p-4 p-md-5">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h5 mb-0">Kriterler ve ağırlıkları</h2>
@@ -38,7 +38,7 @@
               <tbody>
                 {% for name, weight in [('Müşteri değeri', 40), ('İş değeri', 30), ('Uygulama kolaylığı', 20), ('Maliyet avantajı', 10)] %}
                 <tr>
-                  <td><input class="form-control" name="criterion_name_{{ loop.index }}" value="{{ name }}" maxlength="80"></td>
+                  <td><input class="form-control criterion-name" name="criterion_name_{{ loop.index }}" value="{{ name }}" maxlength="80"></td>
                   <td class="text-end"><input class="form-control weight ms-auto" type="number" name="criterion_weight_{{ loop.index }}" value="{{ weight }}" min="0" max="100" step="1"></td>
                 </tr>
                 {% endfor %}
@@ -62,7 +62,7 @@
                 {% for name in ['Müşteri değeri', 'İş değeri', 'Uygulama kolaylığı', 'Maliyet avantajı'] %}
                 <tr>
                   <td>{{ name }}</td>
-                  <td class="text-center"><input class="form-control mx-auto" type="number" name="score_{{ loop.index }}" value="0" min="0" max="10" step="1" style="max-width: 110px"></td>
+                  <td class="text-center"><input class="form-control criterion-score mx-auto" type="number" name="score_{{ loop.index }}" value="0" min="0" max="10" step="1" style="max-width: 110px"></td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -71,12 +71,13 @@
 
           <div class="mt-4 d-flex justify-content-end gap-2">
             <button type="reset" class="btn btn-outline-secondary">Temizle</button>
-            <button type="button" class="btn btn-primary" disabled title="12 Eylül’de API bağlantısı eklenecek">Puanlamayı kaydet</button>
+            <button type="submit" class="btn btn-primary">Puanlamayı kaydet</button>
           </div>
+          <div id="save-status" class="mt-3 small" role="status" aria-live="polite"></div>
         </div>
       </form>
       {% endif %}
-      <section class="card border-0 mt-4"><div class="card-body p-4"><p class="small text-secondary mb-0">Volere sonucu, her kriter puanının yüzde ağırlığıyla çarpılıp toplanmasıyla hesaplanır. Kaydetme ve doğrulama işlemi sonraki görevde API katmanına bağlanacaktır.</p></div></section>
+      <section class="card border-0 mt-4"><div class="card-body p-4"><p class="small text-secondary mb-0">Volere sonucu, her kriter puanının yüzde ağırlığıyla çarpılıp toplanmasıyla hesaplanır. Kaydetme işleminde kriter ağırlıklarının toplamı tam olarak 100 olmalıdır.</p></div></section>
     </main>
     <script>
       const weights = document.querySelectorAll(".weight");
@@ -84,6 +85,28 @@
       weights.forEach((input) => input.addEventListener("input", () => {
         total.textContent = [...weights].reduce((sum, item) => sum + (Number(item.value) || 0), 0);
       }));
+      const form = document.getElementById("volere-form");
+      if (form) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const status = document.getElementById("save-status");
+          const names = [...document.querySelectorAll(".criterion-name")];
+          const scores = [...document.querySelectorAll(".criterion-score")];
+          const payload = {
+            requirement_id: Number(new FormData(form).get("requirement_id")),
+            criteria: names.map((name, index) => ({ name: name.value, weight: Number(weights[index].value), score: Number(scores[index].value) })),
+          };
+          try {
+            const response = await fetch("/api/v1/volere/scores", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+            const result = await response.json();
+            status.className = response.ok ? "mt-3 small text-success" : "mt-3 small text-danger";
+            status.textContent = response.ok ? `Puanlama kaydedildi. Normalize skor: ${result.normalized_score}` : (result.detail || "Kaydetme sırasında hata oluştu.");
+          } catch (_) {
+            status.className = "mt-3 small text-danger";
+            status.textContent = "Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar dene.";
+          }
+        });
+      }
     </script>
   </body>
 </html>
