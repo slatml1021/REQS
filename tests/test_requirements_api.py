@@ -107,6 +107,36 @@ def test_volere_score_requires_weights_to_total_one_hundred():
     assert response.status_code == 422
 
 
+def test_volere_score_rejects_duplicate_criterion_names():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    response = client.put(
+        "/api/v1/volere/scores",
+        json={
+            "requirement_id": requirement_id,
+            "criteria": [
+                {"name": "Değer", "weight": 50, "score": 8},
+                {"name": " değer ", "weight": 50, "score": 6},
+            ],
+        },
+    )
+    assert response.status_code == 422
+
+
+def test_volere_score_rejects_missing_requirement_and_out_of_range_score():
+    missing_requirement = client.put(
+        "/api/v1/volere/scores",
+        json={"requirement_id": 99, "criteria": [{"name": "Değer", "weight": 100, "score": 8}]},
+    )
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    invalid_score = client.put(
+        "/api/v1/volere/scores",
+        json={"requirement_id": requirement_id, "criteria": [{"name": "Değer", "weight": 100, "score": 11}]},
+    )
+
+    assert missing_requirement.status_code == 404
+    assert invalid_score.status_code == 422
+
+
 def test_ahp_comparison_is_saved_once_per_requirement_pair():
     left_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     right_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor üretimi"}).json()["id"]
