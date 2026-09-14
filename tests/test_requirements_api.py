@@ -107,6 +107,17 @@ def test_volere_score_requires_weights_to_total_one_hundred():
     assert response.status_code == 422
 
 
+def test_common_results_exposes_normalized_volere_score():
+    requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
+    client.put(
+        "/api/v1/volere/scores",
+        json={"requirement_id": requirement_id, "criteria": [{"name": "Değer", "weight": 100, "score": 8}]},
+    )
+    response = client.get("/api/v1/prioritization/results")
+    assert response.status_code == 200
+    assert response.json() == [{"requirement_id": requirement_id, "requirement_key": "REQ-001", "requirement_title": "Kullanıcı girişi", "method": "volere", "raw_score": 8.0, "normalized_score": 80.0}]
+
+
 def test_volere_score_rejects_duplicate_criterion_names():
     requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     response = client.put(
