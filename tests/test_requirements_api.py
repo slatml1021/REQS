@@ -118,6 +118,20 @@ def test_common_results_exposes_normalized_volere_score():
     assert response.json() == [{"requirement_id": requirement_id, "requirement_key": "REQ-001", "requirement_title": "Kullanıcı girişi", "method": "volere", "raw_score": 8.0, "normalized_score": 80.0}]
 
 
+def test_traceability_matrix_is_derived_from_requirement_relations():
+    first = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    second = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    from app.models import RelationType, RequirementRelation
+    db = TestingSessionLocal()
+    db.add(RequirementRelation(source_requirement_id=second, target_requirement_id=first, relation_type=RelationType.DEPENDS_ON))
+    db.commit()
+    db.close()
+
+    response = client.get("/api/v1/traceability/matrix")
+    assert response.status_code == 200
+    assert response.json()["matrix"]["REQ-002"]["REQ-001"] == ["depends_on"]
+
+
 def test_volere_score_rejects_duplicate_criterion_names():
     requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     response = client.put(
