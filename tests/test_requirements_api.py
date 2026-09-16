@@ -132,6 +132,14 @@ def test_traceability_matrix_is_derived_from_requirement_relations():
     assert response.json()["matrix"]["REQ-002"]["REQ-001"] == ["depends_on"]
 
 
+def test_traceability_graph_screen_uses_matrix_endpoint():
+    response = client.get("/traceability/graph")
+
+    assert response.status_code == 200
+    assert "İzlenebilirlik ilişki ağı" in response.text
+    assert "/api/v1/traceability/matrix" in response.text
+
+
 def test_volere_score_rejects_duplicate_criterion_names():
     requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     response = client.put(

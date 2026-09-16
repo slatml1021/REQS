@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>REQS | İzlenebilirlik Ağı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body { background: #f6f8fb; }
+      .app-shell { max-width: 1040px; }
+      .brand { color: #194185; font-weight: 700; letter-spacing: .04em; }
+      #traceability-graph { width: 100%; min-height: 480px; background: #fff; border: 1px solid #dfe5ef; border-radius: .75rem; }
+      .node { fill: #e7f0ff; stroke: #194185; stroke-width: 1.5; }
+      .node-label { fill: #102a56; font: 600 13px system-ui, sans-serif; text-anchor: middle; dominant-baseline: middle; }
+      .edge { stroke: #637083; stroke-width: 1.6; }
+      .edge-label { fill: #435066; font: 11px system-ui, sans-serif; text-anchor: middle; }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell container py-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <p class="brand mb-1">REQS</p>
+          <h1 class="h2 mb-1">İzlenebilirlik ilişki ağı</h1>
+          <p class="text-secondary mb-0">Gereksinimler arasındaki yönlü ilişkileri tek ekranda incele.</p>
+        </div>
+        <span class="badge text-bg-light border">İzlenebilirlik</span>
+      </div>
+      <section class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <div id="graph-status" class="text-secondary small mb-3" role="status" aria-live="polite">İlişkiler yükleniyor…</div>
+          <svg id="traceability-graph" viewBox="0 0 960 480" role="img" aria-label="Gereksinim izlenebilirlik ilişki ağı"></svg>
+        </div>
+      </section>
+      <section class="mt-4 card border-0">
+        <div class="card-body p-4 small text-secondary">
+          <strong>Okuma notu:</strong> Ok yönü kaynak gereksinimden hedef gereksinime gider. Ok üzerindeki etiket ilişki türünü gösterir.
+        </div>
+      </section>
+    </main>
+    <script>
+      const svg = document.getElementById("traceability-graph");
+      const status = document.getElementById("graph-status");
+      const svgNS = "http://www.w3.org/2000/svg";
+      const draw = (name, attributes, text) => {
+        const element = document.createElementNS(svgNS, name);
+        Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+        if (text) element.textContent = text;
+        svg.appendChild(element);
+        return element;
+      };
+      const relationLabel = (value) => ({
+        depends_on: "bağlıdır", prerequisite_of: "ön koşuludur", refines: "detaylandırır", related_to: "ilişkilidir",
+      }[value] || value);
+      fetch("/api/v1/traceability/matrix")
+        .then((response) => response.ok ? response.json() : Promise.reject())
+        .then((data) => {
+          const keys = data.requirements;
+          if (!keys.length) {
+            status.textContent = "Görselleştirmek için önce gereksinim ekle.";
+            return;
+          }
+          const positions = Object.fromEntries(keys.map((key, index) => {
+            const angle = (Math.PI * 2 * index / keys.length) - Math.PI / 2;
+            return [key, { x: 480 + 310 * Math.cos(angle), y: 240 + 160 * Math.sin(angle) }];
+          }));
+          const edges = [];
+          keys.forEach((source) => keys.forEach((target) => {
+            const relations = data.matrix[source][target];
+            if (relations.length) edges.push({ source, target, relations });
+          }));
+          draw("defs", {});
+          svg.lastChild.innerHTML = '<marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 z" fill="#637083"/></marker>';
+          edges.forEach(({ source, target, relations }) => {
+            const from = positions[source], to = positions[target];
+            const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
+            const offsetX = dx / length * 54, offsetY = dy / length * 25;
+            draw("line", { x1: from.x + offsetX, y1: from.y + offsetY, x2: to.x - offsetX, y2: to.y - offsetY, class: "edge", "marker-end": "url(#arrow)" });
+            draw("text", { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 - 7, class: "edge-label" }, relations.map(relationLabel).join(", "));
+          });
+          keys.forEach((key) => {
+            const { x, y } = positions[key];
+            draw("rect", { x: x - 54, y: y - 25, width: 108, height: 50, rx: 10, class: "node" });
+            draw("text", { x, y, class: "node-label" }, key);
+          });
+          status.textContent = `${keys.length} gereksinim ve ${edges.length} yönlü ilişki gösteriliyor.`;
+        })
+        .catch(() => { status.textContent = "İlişki verisi yüklenemedi; bağlantıyı kontrol edip tekrar dene."; });
+    </script>
+  </body>
+</html>

@@ -38,3 +38,9 @@ def volere_scoring(request: Request, db: Session = Depends(get_db)):
     """Render the initial Volere criteria and scoring screen."""
     requirements = list(db.scalars(select(Requirement).order_by(Requirement.key)))
     return templates.TemplateResponse(request, "volere_scoring.html", {"requirements": requirements})
+
+
+@app.get("/traceability/graph")
+def traceability_graph(request: Request):
+    """Render the interactive requirement relation graph."""
+    return templates.TemplateResponse(request, "traceability_graph.html")
