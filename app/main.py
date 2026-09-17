@@ -44,3 +44,9 @@ def volere_scoring(request: Request, db: Session = Depends(get_db)):
 def traceability_graph(request: Request):
     """Render the interactive requirement relation graph."""
     return templates.TemplateResponse(request, "traceability_graph.html")
+
+
+@app.get("/prioritization/dashboard")
+def prioritization_dashboard(request: Request):
+    """Render the method-neutral priority result screen."""
+    return templates.TemplateResponse(request, "prioritization_dashboard.html")

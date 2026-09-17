@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>REQS | Önceliklendirme Sonuçları</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body { background: #f6f8fb; }
+      .app-shell { max-width: 1040px; }
+      .brand { color: #194185; font-weight: 700; letter-spacing: .04em; }
+      .score { font-variant-numeric: tabular-nums; font-weight: 700; color: #194185; }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell container py-5">
+      <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+        <div>
+          <p class="brand mb-1">REQS</p>
+          <h1 class="h2 mb-1">Önceliklendirme sonuçları</h1>
+          <p class="text-secondary mb-0">Puanları ortak 0–100 ölçeğinde karşılaştır ve her gereksinimin ilişkilerini incele.</p>
+        </div>
+        <a class="btn btn-outline-primary" href="/traceability/graph">Tüm ilişki ağını aç</a>
+      </div>
+      <section class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div id="results-status" class="p-4 text-secondary" role="status" aria-live="polite">Sonuçlar yükleniyor…</div>
+          <div class="table-responsive" id="results-container" hidden>
+            <table class="table align-middle mb-0">
+              <thead class="table-light"><tr><th>Gereksinim</th><th>Yöntem</th><th>Ham puan</th><th>Normalize puan</th><th class="text-end">İzlenebilirlik</th></tr></thead>
+              <tbody id="results-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      const status = document.getElementById("results-status");
+      const container = document.getElementById("results-container");
+      const body = document.getElementById("results-body");
+      const methodLabel = (method) => ({ ahp: "AHP", wiegers: "Wiegers", volere: "Volere" }[method] || method);
+      fetch("/api/v1/prioritization/results")
+        .then((response) => response.ok ? response.json() : Promise.reject())
+        .then((results) => {
+          if (!results.length) {
+            status.textContent = "Henüz kaydedilmiş öncelik puanı yok. Bir yöntemle değerlendirme yaptıktan sonra sonuçlar burada gösterilecek.";
+            return;
+          }
+          results.forEach((result) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td><strong>${result.requirement_key}</strong><br><span class="small text-secondary"></span></td><td>${methodLabel(result.method)}</td><td>${result.raw_score}</td><td class="score">${result.normalized_score.toFixed(2)} / 100</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/traceability/graph?highlight=${encodeURIComponent(result.requirement_key)}">İlişkileri gör</a></td>`;
+            row.querySelector(".text-secondary").textContent = result.requirement_title;
+            body.appendChild(row);
+          });
+          status.hidden = true;
+          container.hidden = false;
+        })
+        .catch(() => { status.textContent = "Sonuçlar yüklenemedi; bağlantıyı kontrol edip tekrar dene."; });
+    </script>
+  </body>
+</html>

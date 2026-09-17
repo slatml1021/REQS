@@ -140,6 +140,15 @@ def test_traceability_graph_screen_uses_matrix_endpoint():
     assert "/api/v1/traceability/matrix" in response.text
 
 
+def test_prioritization_dashboard_links_results_to_traceability_graph():
+    response = client.get("/prioritization/dashboard")
+
+    assert response.status_code == 200
+    assert "Önceliklendirme sonuçları" in response.text
+    assert "/api/v1/prioritization/results" in response.text
+    assert "/traceability/graph?highlight=" in response.text
+
+
 def test_volere_score_rejects_duplicate_criterion_names():
     requirement_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Kullanıcı girişi"}).json()["id"]
     response = client.put(

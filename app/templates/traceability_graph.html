@@ -41,6 +41,7 @@
     <script>
       const svg = document.getElementById("traceability-graph");
       const status = document.getElementById("graph-status");
+      const highlightedKey = new URLSearchParams(window.location.search).get("highlight");
       const svgNS = "http://www.w3.org/2000/svg";
       const draw = (name, attributes, text) => {
         const element = document.createElementNS(svgNS, name);
@@ -80,7 +81,7 @@
           });
           keys.forEach((key) => {
             const { x, y } = positions[key];
-            draw("rect", { x: x - 54, y: y - 25, width: 108, height: 50, rx: 10, class: "node" });
+            draw("rect", { x: x - 54, y: y - 25, width: 108, height: 50, rx: 10, class: "node", ...(key === highlightedKey ? { fill: "#ffd56a" } : {}) });
             draw("text", { x, y, class: "node-label" }, key);
           });
           status.textContent = `${keys.length} gereksinim ve ${edges.length} yönlü ilişki gösteriliyor.`;
