@@ -140,6 +140,36 @@ def test_traceability_graph_screen_uses_matrix_endpoint():
     assert "/api/v1/traceability/matrix" in response.text
 
 
+def test_forward_and_backward_traceability_follow_relation_direction():
+    source_id = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    target_id = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    from app.models import RelationType, RequirementRelation
+
+    db = TestingSessionLocal()
+    db.add(
+        RequirementRelation(
+            source_requirement_id=source_id,
+            target_requirement_id=target_id,
+            relation_type=RelationType.REFINES,
+        )
+    )
+    db.commit()
+    db.close()
+
+    forward = client.get("/api/v1/traceability/REQ-001/forward")
+    backward = client.get("/api/v1/traceability/REQ-002/backward")
+
+    assert forward.status_code == 200
+    assert forward.json()["relations"] == [{"relation_type": "refines", "requirement": {"id": target_id, "key": "REQ-002", "title": "Rapor"}}]
+    assert backward.status_code == 200
+    assert backward.json()["relations"] == [{"relation_type": "refines", "requirement": {"id": source_id, "key": "REQ-001", "title": "Giriş"}}]
+
+
+def test_traceability_direction_queries_are_empty_for_unknown_requirement():
+    assert client.get("/api/v1/traceability/REQ-999/forward").json()["relations"] == []
+    assert client.get("/api/v1/traceability/REQ-999/backward").json()["relations"] == []
+
+
 def test_prioritization_dashboard_links_results_to_traceability_graph():
     response = client.get("/prioritization/dashboard")
 
