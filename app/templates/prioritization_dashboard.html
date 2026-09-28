@@ -10,6 +10,7 @@
       .app-shell { max-width: 1040px; }
       .brand { color: #194185; font-weight: 700; letter-spacing: .04em; }
       .score { font-variant-numeric: tabular-nums; font-weight: 700; color: #194185; }
+      .chart-card { min-height: 330px; }
     </style>
   </head>
   <body>
@@ -33,7 +34,9 @@
           </div>
         </div>
       </section>
+      <section class="row g-4 mt-1"><div class="col-lg-7"><div class="chart-card card border-0 shadow-sm p-4"><h2 class="h6">Normalize puan karşılaştırması</h2><canvas id="bar-chart"></canvas></div></div><div class="col-lg-5"><div class="chart-card card border-0 shadow-sm p-4"><h2 class="h6">Puan payları</h2><canvas id="share-chart"></canvas></div></div></section>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script>
       const status = document.getElementById("results-status");
       const container = document.getElementById("results-container");
@@ -54,6 +57,11 @@
           });
           status.hidden = true;
           container.hidden = false;
+          const labels = results.map(result => `${result.requirement_key} (${methodLabel(result.method)})`);
+          const values = results.map(result => result.normalized_score);
+          const palette = ["#194185", "#247ba0", "#56c1b6", "#e59f23", "#b35050"];
+          new Chart(document.getElementById("bar-chart"), { type: "bar", data: { labels, datasets: [{ label: "Puan / 100", data: values, backgroundColor: palette }] }, options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } } });
+          new Chart(document.getElementById("share-chart"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: palette }] }, options: { responsive: true } });
         })
         .catch(() => { status.textContent = "Sonuçlar yüklenemedi; bağlantıyı kontrol edip tekrar dene."; });
     </script>

@@ -5,7 +5,7 @@
 
 ## Tamamlanan sistem kapsamı
 
-- Gereksinim kayıtları, benzersiz anahtarlar, durum bilgisi ve MySQL/SQLAlchemy kalıcılığı.
+- Gereksinim kayıtları, benzersiz anahtarlar, durum bilgisi ve PostgreSQL/SQLAlchemy kalıcılığı.
 - AHP ikili karşılaştırmaları, Saaty özdeğer öncelik vektörü, tutarlılık oranı ve ortak 0-100 sonuç kaydı.
 - Wiegers fayda, ceza, maliyet ve risk ağırlıklandırması ile toplu puanlama ve normalize karşılaştırma.
 - Volere kriter ağırlığı ve 0-10 puanlama akışı.

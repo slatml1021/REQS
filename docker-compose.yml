@@ -1,20 +1,19 @@
 services:
   db:
-    image: mysql:8.4
+    image: postgres:16-alpine
     environment:
-      MYSQL_DATABASE: reqs
-      MYSQL_USER: reqs
-      MYSQL_PASSWORD: reqs
-      MYSQL_ROOT_PASSWORD: reqs_root
+      POSTGRES_DB: reqs
+      POSTGRES_USER: reqs
+      POSTGRES_PASSWORD: reqs
     ports:
-      - "3307:3306"
+      - "5432:5432"
     volumes:
-      - reqs_mysql_data:/var/lib/mysql
+      - reqs_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -preqs_root"]
+      test: ["CMD-SHELL", "pg_isready -U reqs -d reqs"]
       interval: 5s
       timeout: 5s
       retries: 10
 
 volumes:
-  reqs_mysql_data:
+  reqs_postgres_data:
