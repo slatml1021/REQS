@@ -5,6 +5,8 @@ TÜBİTAK 2209-A bitirme projesi — Dilara Topal ve Sıla Temel — Danışman:
 
 REQS; gereksinimleri AHP, Wiegers ve Volere yöntemleriyle önceliklendirir, ilişkileri matriste ve ağ görünümünde izler, değişiklik etkisini sorgular ve sonuçları PDF olarak dışa aktarır. Uygulama web sitesidir; yerel olarak `http://127.0.0.1:8000/` adresinden açılır.
 
+![REQS sistem özeti](docs/assets/reqs-sistem-ozeti.svg)
+
 ## Teknoloji yığını
 
 | Katman | Teknoloji |
@@ -72,6 +74,7 @@ literature/          Yerel tam metin arşivi ve kaynak denetimi
 - [İzlenebilirlik ve etki analizi](docs/IZLENEBILIRLIK_VE_ETKI_ANALIZI.md), [vaka çalışması](docs/VAKA_CALISMASI.md)
 - [Görev dağılımı](docs/GOREV_DAGILIMI.md), [takvim](docs/CALISMA_TAKVIMI.md), [uygunluk denetimi](docs/GOREV_UYUMLULUK_DENETIMI.md)
 - [Literatür taraması](docs/LITERATUR_TARAMASI.md), [kullanıcı kılavuzu](docs/KULLANICI_KILAVUZU.md), [teslim kontrolü](docs/TUBITAK_2209A_BASVURU_KONTROL_LISTESI.md)
+- [Kaynak belgeler envanteri](docs/KAYNAK_BELGELER.md) ve [vaka PDF raporu](reports/reqs-vaka-raporu.pdf)
 
 ## Dürüst kanıt sınırı
 
