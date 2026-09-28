@@ -7,6 +7,7 @@ Create Date: 2026-09-03
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 
 revision = "20260903_01"
@@ -16,8 +17,8 @@ depends_on = None
 
 
 def upgrade() -> None:
-    relation_type = sa.Enum("DEPENDS_ON", "PREREQUISITE_OF", "REFINES", "RELATED_TO", name="relation_type")
-    priority_method = sa.Enum("AHP", "WIEGERS", "VOLERE", name="priority_method")
+    relation_type = postgresql.ENUM("DEPENDS_ON", "PREREQUISITE_OF", "REFINES", "RELATED_TO", name="relation_type", create_type=False)
+    priority_method = postgresql.ENUM("AHP", "WIEGERS", "VOLERE", name="priority_method", create_type=False)
     bind = op.get_bind()
     relation_type.create(bind, checkfirst=True)
     priority_method.create(bind, checkfirst=True)
