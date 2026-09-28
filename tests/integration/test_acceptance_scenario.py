@@ -147,7 +147,7 @@ def test_five_requirement_scenario_covers_core_acceptance_criteria(client: TestC
     assert "chart.js" in client.get("/prioritization/dashboard").text.lower()
     graph = client.get("/traceability/graph")
     assert "vis-network" in graph.text.lower()
-    assert "/api/v1/traceability/matrix" in graph.text
+    assert "/api/v1/traceability/graph" in graph.text
     pdf = client.get("/api/v1/reports/pdf")
     assert pdf.status_code == 200
     assert pdf.headers["content-type"].startswith("application/pdf")

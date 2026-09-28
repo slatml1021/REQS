@@ -1,0 +1,28 @@
+{
+  "project": "KOBİ Stok ve Sipariş Yönetim Sistemi",
+  "requirements": [
+    {"key": "REQS-01", "title": "Güvenli kullanıcı girişi", "description": "Rol tabanlı erişim ile kullanıcı oturumu açma.", "requirement_type": "functional", "status": "approved", "ahp_rank": 9, "wiegers": [9, 9, 2, 2], "volere": [10, 9, 7, 8]},
+    {"key": "REQS-02", "title": "Ürün kartı yönetimi", "description": "Ürün, kategori ve birim bilgilerini yönetme.", "requirement_type": "functional", "status": "approved", "ahp_rank": 8, "wiegers": [9, 8, 3, 2], "volere": [9, 9, 8, 7]},
+    {"key": "REQS-03", "title": "Stok seviyesi takibi", "description": "Depo bazında anlık stok miktarını gösterme.", "requirement_type": "functional", "status": "approved", "ahp_rank": 8, "wiegers": [9, 9, 4, 3], "volere": [10, 8, 7, 7]},
+    {"key": "REQS-04", "title": "Düşük stok uyarısı", "description": "Eşik altındaki stoklar için bildirim üretme.", "requirement_type": "functional", "status": "draft", "ahp_rank": 7, "wiegers": [8, 7, 3, 2], "volere": [9, 7, 8, 8]},
+    {"key": "REQS-05", "title": "Sipariş oluşturma", "description": "Tedarikçiye satın alma siparişi oluşturma.", "requirement_type": "functional", "status": "approved", "ahp_rank": 8, "wiegers": [9, 8, 5, 3], "volere": [9, 9, 6, 6]},
+    {"key": "REQS-06", "title": "Tedarikçi performans raporu", "description": "Teslimat süresi ve kaliteye göre tedarikçi değerlendirme.", "requirement_type": "functional", "status": "draft", "ahp_rank": 5, "wiegers": [6, 5, 5, 4], "volere": [6, 6, 6, 5]},
+    {"key": "REQS-07", "title": "Yönetim gösterge paneli", "description": "Stok, sipariş ve uyarı özetlerini görselleştirme.", "requirement_type": "functional", "status": "draft", "ahp_rank": 5, "wiegers": [6, 4, 4, 3], "volere": [7, 5, 7, 6]},
+    {"key": "REQS-08", "title": "CSV dışa aktarma", "description": "Raporları CSV olarak indirme.", "requirement_type": "functional", "status": "draft", "ahp_rank": 3, "wiegers": [4, 3, 2, 2], "volere": [5, 4, 9, 8]},
+    {"key": "REQS-09", "title": "Denetim kaydı", "description": "Kritik işlemlerin zaman damgalı kayıtlarını tutma.", "requirement_type": "non_functional", "status": "approved", "ahp_rank": 7, "wiegers": [8, 8, 4, 3], "volere": [8, 8, 6, 7]},
+    {"key": "REQS-10", "title": "Yedekleme ve kurtarma", "description": "Günlük yedek ve geri yükleme prosedürü.", "requirement_type": "non_functional", "status": "approved", "ahp_rank": 7, "wiegers": [8, 9, 5, 4], "volere": [9, 8, 5, 6]}
+  ],
+  "relations": [
+    ["REQS-01", "REQS-02", "depends_on", true],
+    ["REQS-02", "REQS-03", "depends_on", true],
+    ["REQS-03", "REQS-04", "prerequisite_of", true],
+    ["REQS-03", "REQS-05", "depends_on", true],
+    ["REQS-05", "REQS-06", "related_to", false],
+    ["REQS-04", "REQS-07", "refines", true],
+    ["REQS-07", "REQS-08", "similar_to", false],
+    ["REQS-01", "REQS-09", "depends_on", true],
+    ["REQS-09", "REQS-10", "prerequisite_of", true],
+    ["REQS-06", "REQS-08", "conflicts_with", false]
+  ],
+  "volere_criteria": [["Müşteri değeri", 40], ["İş değeri", 30], ["Uygulama kolaylığı", 20], ["Maliyet avantajı", 10]]
+}

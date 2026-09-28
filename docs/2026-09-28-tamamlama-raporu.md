@@ -1,6 +1,7 @@
 # REQS Tamamlama Raporu
 
-**Tarih:** 28 Eylül 2026  
+**İlk kayıt:** 28 Eylül 2026
+**Teknik revizyon:** 29 Eylül 2026
 **Çalışma:** TÜBİTAK 2209-A REQS prototipinin tamamlanması
 
 ## Tamamlanan sistem kapsamı
@@ -11,13 +12,13 @@
 - Volere kriter ağırlığı ve 0-10 puanlama akışı.
 - İlişki CRUD'u, otomatik izlenebilirlik matrisi, ağ görünümü, ileri-geri sorgular ve transitive etki analizi.
 - Başlangıç çalışma alanı, puanlama, matris, ağ, etki analizi ve sonuç ekranlarını bağlayan responsive Bootstrap arayüzü.
-- Güncel puanları ve izlenebilirlik matrisini içeren Türkçe karakter uyumlu PDF dışa aktarma.
+- Güncel puanları, yöntem özetlerini, SVG grafiği, izlenebilirlik matrisini ve etki listesini içeren Türkçe karakter uyumlu WeasyPrint PDF dışa aktarma.
 
 ## Doğrulama
 
-- Otomatik test paketi: **24/24 geçti**.
-- PDF çıktısı A4 olarak render edildi; başlık, tablolar ve Türkçe karakterler görsel olarak kontrol edildi.
-- WeasyPrint'in yerel sistem bağımlılığı sorunu, taşınabilir ReportLab üreticisi kullanılarak giderildi.
+- Otomatik test paketi: **29/29 geçti**; 1 üçüncü taraf kullanım uyarısı, hata yok.
+- PDF çıktısı WeasyPrint 66.0 ile 4 A4 sayfa olarak üretildi; başlık, tablolar, grafik, matris, etki listesi ve Türkçe karakterler görsel olarak kontrol edildi.
+- Yerel dosya paylaşımındaki test kilidi, uygulama klasörünü bağlamayan ayrı Docker test hizmetiyle giderildi. PDF üretim teknolojisi WeasyPrint olarak korunmuştur.
 
 ## Akademik kapsam notu
 
@@ -25,4 +26,4 @@ Uygulama, başvurudaki yöntemlerin işlevsel prototipidir; elde edilen puanlar 
 
 ## GitHub durumu
 
-Değişiklikler yerel Git geçmişine kaydedilecektir. Uzak GitHub deposu tanımlı olmadığı için gönderim yapılamaz; depo adresi sağlandığında `main` dalı gönderilebilir.
+Değişiklikler yerel Git geçmişine kaydedilecektir. Uzak GitHub deposu tanımlı olmadığı için gönderim yapılamaz; depo adresi sağlandığında seçilen uzak dal gönderilebilir.

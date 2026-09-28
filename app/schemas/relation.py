@@ -9,6 +9,7 @@ class RelationWrite(BaseModel):
     source_requirement_id: int = Field(gt=0)
     target_requirement_id: int = Field(gt=0)
     relation_type: RelationType
+    is_directional: bool = True
 
     @model_validator(mode="after")
     def distinct_requirements(self):
@@ -21,3 +22,8 @@ class RelationRead(RelationWrite):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class RelationUpdate(BaseModel):
+    relation_type: RelationType | None = None
+    is_directional: bool | None = None

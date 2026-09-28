@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      @page { size: A4; margin: 16mm 15mm 18mm; @bottom-center { content: "REQS | Sayfa " counter(page) " / " counter(pages); color: #64748b; font-size: 8pt; } }
+      body { color: #172033; font-family: DejaVu Sans, Arial, sans-serif; font-size: 9pt; line-height: 1.42; }
+      h1 { color: #123f71; font-size: 22pt; margin: 0 0 4mm; } h2 { color: #123f71; font-size: 14pt; margin: 8mm 0 3mm; }
+      .meta, .muted { color: #526174; } .summary { background: #eef5fb; border-left: 4px solid #247ba0; padding: 3mm 4mm; }
+      table { border-collapse: collapse; width: 100%; margin: 3mm 0; } thead { display: table-header-group; }
+      th { background: #123f71; color: white; font-weight: 600; } th, td { border: 0.3pt solid #cbd5e1; padding: 2mm; vertical-align: top; }
+      tr { break-inside: avoid; } .small { font-size: 7.5pt; } .score-chart { width: 100%; height: auto; }
+      .impact { background: #fff7e5; border-left: 4px solid #d97706; padding: 3mm 4mm; } .matrix { font-size: 6.8pt; table-layout: fixed; }
+    </style>
+  </head>
+  <body>
+    <h1>REQS Karar Destek Raporu</h1>
+    <p class="meta">{{ generated_on }} | Yazılım Projelerinde Gereksinim Önceliklendirmesi ve İzlenebilirlik İçin Karar Destek Sistemi</p>
+    <div class="summary"><strong>Kapsam:</strong> Bu rapor AHP, Karl Wiegers ve Volere yöntemleriyle oluşturulmuş puanları, izlenebilirlik ilişkilerini ve mevcut etki analizi özetini sistemdeki güncel veriden üretir.</div>
+
+    <h2>Yöntemler</h2>
+    <table><thead><tr><th>Yöntem</th><th>Kısa açıklama</th></tr></thead><tbody>
+      <tr><td>AHP</td><td>Saaty ikili karşılaştırmaları, özdeğer öncelik vektörü ve tutarlılık oranı ile karar verir.</td></tr>
+      <tr><td>Wiegers</td><td>Fayda ve ceza değerlerini maliyet ve risk ile ağırlıklı biçimde karşılaştırır.</td></tr>
+      <tr><td>Volere</td><td>En fazla dört kriterin yüzde ağırlıklarıyla 0-10 puanları birleştirir.</td></tr>
+    </tbody></table>
+
+    <h2>Önceliklendirme sonuçları</h2>
+    <table><thead><tr><th>Gereksinim</th><th>Yöntem</th><th>Ham puan</th><th>Normalize puan</th></tr></thead><tbody>
+      {% for result in results %}<tr><td>{{ result.requirement_key }} - {{ result.requirement_title }}</td><td>{{ result.method_label }}</td><td>{{ result.raw_score }}</td><td>{{ result.normalized_score }} / 100</td></tr>{% else %}<tr><td colspan="4">Henüz hesaplanmış öncelik puanı yok.</td></tr>{% endfor %}
+    </tbody></table>
+    <h2>Normalize puan grafiği</h2>{{ score_chart | safe }}
+
+    <h2>İzlenebilirlik matrisi</h2>
+    <table class="matrix"><thead><tr><th>Kaynak / Hedef</th>{% for requirement in requirements %}<th>{{ requirement.key }}</th>{% endfor %}</tr></thead><tbody>
+      {% for source in requirements %}<tr><th>{{ source.key }}</th>{% for target in requirements %}<td>{{ matrix.get((source.id, target.id), '—') }}</td>{% endfor %}</tr>{% else %}<tr><td>Henüz gereksinim yok.</td></tr>{% endfor %}
+    </tbody></table>
+    <p class="small muted"><strong>Matris kodları:</strong> DEP=bağımlılık, PRE=ön koşul, SIM=benzerlik, REF=üst-alt/detaylandırma, CON=çelişki, REL=genel ilişki.</p>
+
+    <h2>Etki analizi özeti</h2>
+    {% if impacts %}<div class="impact"><strong>{{ impacts|length }} ilişki temelli olası etki</strong><ul>{% for impact in impacts %}<li>{{ impact.source }} → {{ impact.target }} ({{ impact.relation_type }})</li>{% endfor %}</ul></div>{% else %}<p class="muted">Henüz etki özeti üretecek ilişki bulunmuyor.</p>{% endif %}
+  </body>
+</html>

@@ -25,7 +25,7 @@
       </div>
       <section class="card border-0 shadow-sm">
         <div class="card-body p-0">
-          <div id="results-status" class="p-4 text-secondary" role="status" aria-live="polite">Sonuçlar yükleniyor…</div>
+          <div class="p-4 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2"><div id="results-status" class="text-secondary" role="status" aria-live="polite">Sonuçlar yükleniyor…</div><label class="small">Yöntem filtresi <select id="method-filter" class="form-select form-select-sm d-inline-block w-auto"><option value="all">Tümü</option><option value="ahp">AHP</option><option value="wiegers">Wiegers</option><option value="volere">Volere</option></select></label></div>
           <div class="table-responsive" id="results-container" hidden>
             <table class="table align-middle mb-0">
               <thead class="table-light"><tr><th>Gereksinim</th><th>Yöntem</th><th>Ham puan</th><th>Normalize puan</th><th class="text-end">İzlenebilirlik</th></tr></thead>
@@ -42,27 +42,34 @@
       const container = document.getElementById("results-container");
       const body = document.getElementById("results-body");
       const methodLabel = (method) => ({ ahp: "AHP", wiegers: "Wiegers", volere: "Volere" }[method] || method);
+      let allResults = [];
+      let charts = [];
+      const render = (results) => {
+        body.innerHTML = "";
+        charts.forEach(chart => chart.destroy()); charts = [];
+        if (!results.length) {
+          status.hidden = false;
+          status.textContent = "Bu filtre için kaydedilmiş öncelik puanı yok.";
+          container.hidden = true;
+          return;
+        }
+        status.hidden = true;
+        container.hidden = false;
+        results.forEach((result) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td><strong>${result.requirement_key}</strong><br><span class="small text-secondary"></span></td><td>${methodLabel(result.method)}</td><td>${result.raw_score}</td><td class="score">${result.normalized_score.toFixed(2)} / 100</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/traceability/graph?highlight=${encodeURIComponent(result.requirement_key)}">İlişkileri gör</a></td>`;
+          row.querySelector(".text-secondary").textContent = result.requirement_title;
+          body.appendChild(row);
+        });
+        const labels = results.map(result => `${result.requirement_key} (${methodLabel(result.method)})`);
+        const values = results.map(result => result.normalized_score);
+        const palette = ["#194185", "#247ba0", "#56c1b6", "#e59f23", "#b35050"];
+        charts.push(new Chart(document.getElementById("bar-chart"), { type: "bar", data: { labels, datasets: [{ label: "Puan / 100", data: values, backgroundColor: palette }] }, options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } } }));
+        charts.push(new Chart(document.getElementById("share-chart"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: palette }] }, options: { responsive: true } }));
+      };
       fetch("/api/v1/prioritization/results")
         .then((response) => response.ok ? response.json() : Promise.reject())
-        .then((results) => {
-          if (!results.length) {
-            status.textContent = "Henüz kaydedilmiş öncelik puanı yok. Bir yöntemle değerlendirme yaptıktan sonra sonuçlar burada gösterilecek.";
-            return;
-          }
-          results.forEach((result) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td><strong>${result.requirement_key}</strong><br><span class="small text-secondary"></span></td><td>${methodLabel(result.method)}</td><td>${result.raw_score}</td><td class="score">${result.normalized_score.toFixed(2)} / 100</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/traceability/graph?highlight=${encodeURIComponent(result.requirement_key)}">İlişkileri gör</a></td>`;
-            row.querySelector(".text-secondary").textContent = result.requirement_title;
-            body.appendChild(row);
-          });
-          status.hidden = true;
-          container.hidden = false;
-          const labels = results.map(result => `${result.requirement_key} (${methodLabel(result.method)})`);
-          const values = results.map(result => result.normalized_score);
-          const palette = ["#194185", "#247ba0", "#56c1b6", "#e59f23", "#b35050"];
-          new Chart(document.getElementById("bar-chart"), { type: "bar", data: { labels, datasets: [{ label: "Puan / 100", data: values, backgroundColor: palette }] }, options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } } });
-          new Chart(document.getElementById("share-chart"), { type: "doughnut", data: { labels, datasets: [{ data: values, backgroundColor: palette }] }, options: { responsive: true } });
-        })
+        .then((results) => { allResults = results; render(results); document.getElementById("method-filter").addEventListener("change", event => render(event.target.value === "all" ? allResults : allResults.filter(item => item.method === event.target.value))); })
         .catch(() => { status.textContent = "Sonuçlar yüklenemedi; bağlantıyı kontrol edip tekrar dene."; });
     </script>
   </body>

@@ -28,7 +28,29 @@ def traceability_matrix(db: Session = Depends(get_db)) -> dict:
         target = id_to_key.get(relation.target_requirement_id)
         if source and target:
             cells[source][target].append(relation.relation_type.value)
+            if not relation.is_directional:
+                cells[target][source].append(relation.relation_type.value)
     return {"requirements": keys, "matrix": cells}
+
+
+@router.get("/graph")
+def traceability_graph_data(db: Session = Depends(get_db)) -> dict:
+    """Return the canonical relation records used by the interactive graph."""
+    requirements = list(db.scalars(select(Requirement).order_by(Requirement.key)))
+    id_to_key = {requirement.id: requirement.key for requirement in requirements}
+    return {
+        "nodes": [{"id": requirement.key, "label": requirement.key, "title": requirement.title} for requirement in requirements],
+        "edges": [
+            {
+                "id": relation.id,
+                "from": id_to_key[relation.source_requirement_id],
+                "to": id_to_key[relation.target_requirement_id],
+                "relation_type": relation.relation_type.value,
+                "is_directional": relation.is_directional,
+            }
+            for relation in db.scalars(select(RequirementRelation).order_by(RequirementRelation.id))
+        ],
+    }
 
 
 @router.get("/{requirement_key}/forward")
@@ -40,13 +62,21 @@ def forward_traceability(requirement_key: str, db: Session = Depends(get_db)) ->
     rows = db.execute(
         select(RequirementRelation, Requirement)
         .join(Requirement, RequirementRelation.target_requirement_id == Requirement.id)
-        .where(RequirementRelation.source_requirement_id == source.id)
+        .where(
+            (RequirementRelation.source_requirement_id == source.id)
+            | ((RequirementRelation.target_requirement_id == source.id) & (RequirementRelation.is_directional.is_(False)))
+        )
         .order_by(Requirement.key, RequirementRelation.relation_type)
     )
     return {
         "requirement_key": source.key,
         "relations": [
-            {"relation_type": relation.relation_type.value, "requirement": _requirement_payload(target)}
+            {
+                "relation_type": relation.relation_type.value,
+                "requirement": _requirement_payload(
+                    target if relation.source_requirement_id == source.id else db.get(Requirement, relation.source_requirement_id)
+                ),
+            }
             for relation, target in rows
         ],
     }
@@ -61,13 +91,21 @@ def backward_traceability(requirement_key: str, db: Session = Depends(get_db)) -
     rows = db.execute(
         select(RequirementRelation, Requirement)
         .join(Requirement, RequirementRelation.source_requirement_id == Requirement.id)
-        .where(RequirementRelation.target_requirement_id == target.id)
+        .where(
+            (RequirementRelation.target_requirement_id == target.id)
+            | ((RequirementRelation.source_requirement_id == target.id) & (RequirementRelation.is_directional.is_(False)))
+        )
         .order_by(Requirement.key, RequirementRelation.relation_type)
     )
     return {
         "requirement_key": target.key,
         "relations": [
-            {"relation_type": relation.relation_type.value, "requirement": _requirement_payload(source)}
+            {
+                "relation_type": relation.relation_type.value,
+                "requirement": _requirement_payload(
+                    source if relation.target_requirement_id == target.id else db.get(Requirement, relation.target_requirement_id)
+                ),
+            }
             for relation, source in rows
         ],
     }

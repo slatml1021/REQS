@@ -132,12 +132,12 @@ def test_traceability_matrix_is_derived_from_requirement_relations():
     assert response.json()["matrix"]["REQ-002"]["REQ-001"] == ["depends_on"]
 
 
-def test_traceability_graph_screen_uses_matrix_endpoint():
+def test_traceability_graph_screen_uses_canonical_graph_endpoint():
     response = client.get("/traceability/graph")
 
     assert response.status_code == 200
     assert "İzlenebilirlik ilişki ağı" in response.text
-    assert "/api/v1/traceability/matrix" in response.text
+    assert "/api/v1/traceability/graph" in response.text
 
 
 def test_forward_and_backward_traceability_follow_relation_direction():
@@ -206,6 +206,27 @@ def test_relation_crud_and_transitive_impact_analysis():
     assert [(item["key"], item["distance"]) for item in impact.json()["affected_requirements"]] == [("REQ-002", 1), ("REQ-003", 2)]
     relation_id = client.get("/api/v1/relations").json()[0]["id"]
     assert client.delete(f"/api/v1/relations/{relation_id}").status_code == 204
+
+
+def test_relation_can_be_updated_and_used_undirectionally():
+    first = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    second = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    created = client.post(
+        "/api/v1/relations",
+        json={"source_requirement_id": first, "target_requirement_id": second, "relation_type": "related_to", "is_directional": True},
+    )
+    assert created.status_code == 201
+    updated = client.patch(
+        f"/api/v1/relations/{created.json()['id']}",
+        json={"relation_type": "similar_to", "is_directional": False},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["relation_type"] == "similar_to"
+    assert updated.json()["is_directional"] is False
+    matrix = client.get("/api/v1/traceability/matrix").json()["matrix"]
+    assert matrix["REQ-001"]["REQ-002"] == ["similar_to"]
+    assert matrix["REQ-002"]["REQ-001"] == ["similar_to"]
+    assert client.get("/api/v1/traceability/graph").json()["edges"][0]["is_directional"] is False
 
 
 def test_core_screens_and_pdf_export_are_available():

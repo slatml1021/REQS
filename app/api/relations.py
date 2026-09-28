@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Requirement, RequirementRelation
-from app.schemas.relation import RelationRead, RelationWrite
+from app.schemas.relation import RelationRead, RelationUpdate, RelationWrite
 
 
 router = APIRouter(prefix="/relations", tags=["traceability"])
@@ -24,6 +24,25 @@ def create_relation(payload: RelationWrite, db: Session = Depends(get_db)) -> Re
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found")
     relation = RequirementRelation(**payload.model_dump())
     db.add(relation)
+    try:
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Relation already exists") from error
+    db.refresh(relation)
+    return relation
+
+
+@router.patch("/{relation_id}", response_model=RelationRead)
+def update_relation(
+    relation_id: int, payload: RelationUpdate, db: Session = Depends(get_db)
+) -> RequirementRelation:
+    """Update the type or directionality of an existing traceability link."""
+    relation = db.get(RequirementRelation, relation_id)
+    if relation is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Relation not found")
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(relation, field, value)
     try:
         db.commit()
     except IntegrityError as error:

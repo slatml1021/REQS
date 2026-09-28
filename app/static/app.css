@@ -1,0 +1,8 @@
+:root { --reqs-blue: #123f71; --reqs-teal: #167a6c; --reqs-bg: #f4f7fb; }
+body { background: var(--reqs-bg); color: #172033; }
+.app-shell { max-width: 1160px; }
+.brand { color: var(--reqs-blue); font-size: 1.25rem; font-weight: 800; letter-spacing: .12em; }
+.hero { background: linear-gradient(135deg, #123f71, #247ba0); border-radius: 1.25rem; color: white; }
+.metric-card { background: white; border-radius: 1rem; box-shadow: 0 .25rem 1rem rgb(15 23 42 / .07); display: flex; flex-direction: column; min-height: 118px; padding: 1.35rem; }
+.metric-card span { color: #526174; font-size: .85rem; }.metric-card strong { color: var(--reqs-blue); font-size: 2rem; line-height: 1.2; }
+.status-approved { color: #0f766e; }.status-draft { color: #b45309; }.status-implemented { color: #1d4ed8; }

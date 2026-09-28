@@ -21,7 +21,7 @@ def ahp_priorities(matrix: list[list[Decimal]]) -> tuple[list[Decimal], Decimal]
     lambda_max = Decimal(str(float(eigenvalues[principal].real)))
     consistency_index = (lambda_max - size) / (size - 1) if size > 1 else Decimal(0)
     random_index = Decimal(str(RI_VALUES.get(size, RI_VALUES[10])))
-    consistency_ratio = consistency_index / random_index if random_index else Decimal(0)
+    consistency_ratio = max(Decimal(0), consistency_index / random_index) if random_index else Decimal(0)
     return priorities, consistency_ratio
 
 

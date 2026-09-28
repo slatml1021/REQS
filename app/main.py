@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -30,6 +31,7 @@ app.include_router(wiegers_router, prefix="/api/v1")
 app.include_router(relations_router, prefix="/api/v1")
 app.include_router(impact_router, prefix="/api/v1")
 app.include_router(reports_router, prefix="/api/v1")
+app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 

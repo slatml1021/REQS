@@ -32,6 +32,30 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    profiles: ["app"]
+    working_dir: /workspace
+    environment:
+      DATABASE_URL: postgresql+psycopg://reqs:reqs@db:5432/reqs
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/workspace
+
+  test:
+    build: .
+    profiles: ["test"]
+    working_dir: /workspace
+    environment:
+      PYTHONPATH: /workspace
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTEST_ADDOPTS: "-p no:cacheprovider"
+    command: pytest -q
+
 volumes:
   reqs_postgres_data:
   reqs_mysql_data:

@@ -42,22 +42,20 @@
       const relationLabel = (value) => ({
         depends_on: "bağlıdır", prerequisite_of: "ön koşuludur", refines: "detaylandırır", related_to: "ilişkilidir",
       }[value] || value);
-      fetch("/api/v1/traceability/matrix")
+      fetch("/api/v1/traceability/graph")
         .then((response) => response.ok ? response.json() : Promise.reject())
         .then((data) => {
-          const keys = data.requirements;
-          if (!keys.length) {
+          const nodes = data.nodes;
+          if (!nodes.length) {
             status.textContent = "Görselleştirmek için önce gereksinim ekle.";
             return;
           }
-          const edges = [];
-          keys.forEach((source) => keys.forEach((target) => {
-            const relations = data.matrix[source][target];
-            if (relations.length) edges.push({ from: source, to: target, label: relations.map(relationLabel).join(", "), arrows: "to" });
-          }));
-          const nodes = new vis.DataSet(keys.map(key => ({ id: key, label: key, color: key === highlightedKey ? "#ffd56a" : "#e7f0ff" })));
-          new vis.Network(container, { nodes, edges: new vis.DataSet(edges) }, { physics: { stabilization: true }, interaction: { hover: true }, nodes: { shape: "box", margin: 12, font: { color: "#102a56", face: "system-ui" }, borderWidth: 1.5 }, edges: { color: "#637083", font: { align: "middle", size: 11 }, smooth: { type: "dynamic" } } });
-          status.textContent = `${keys.length} gereksinim ve ${edges.length} yönlü ilişki gösteriliyor.`;
+          const edges = data.edges.map(edge => ({ from: edge.from, to: edge.to, label: relationLabel(edge.relation_type), arrows: edge.is_directional ? "to" : "", dashes: !edge.is_directional, title: edge.is_directional ? "Yönlü ilişki" : "Yönsüz ilişki" }));
+          const nodeData = new vis.DataSet(nodes.map(node => ({ id: node.id, label: node.label, title: node.title, color: node.id === highlightedKey ? "#ffd56a" : "#e7f0ff" })));
+          const network = new vis.Network(container, { nodes: nodeData, edges: new vis.DataSet(edges) }, { physics: { stabilization: true }, interaction: { hover: true }, nodes: { shape: "box", margin: 12, font: { color: "#102a56", face: "system-ui" }, borderWidth: 1.5 }, edges: { color: "#637083", font: { align: "middle", size: 11 }, smooth: { type: "dynamic" } } });
+          network.on("hoverNode", event => { const connected = network.getConnectedNodes(event.node); nodeData.forEach(node => nodeData.update({ id: node.id, color: node.id === event.node || connected.includes(node.id) ? "#ffd56a" : "#edf2f7" })); });
+          network.on("blurNode", () => nodeData.forEach(node => nodeData.update({ id: node.id, color: node.id === highlightedKey ? "#ffd56a" : "#e7f0ff" })));
+          status.textContent = `${nodes.length} gereksinim ve ${edges.length} ilişki gösteriliyor. Düğüme gelerek bağlı gereksinimleri vurgula.`;
         })
         .catch(() => { status.textContent = "İlişki verisi yüklenemedi; bağlantıyı kontrol edip tekrar dene."; });
     </script>

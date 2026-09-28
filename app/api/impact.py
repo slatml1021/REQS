@@ -38,6 +38,8 @@ def impact_analysis(requirement_key: str, db: Session = Depends(get_db)) -> dict
     graph.add_nodes_from(requirements)
     for relation in db.scalars(select(RequirementRelation)):
         graph.add_edge(relation.source_requirement_id, relation.target_requirement_id, relation_type=relation.relation_type.value)
+        if not relation.is_directional:
+            graph.add_edge(relation.target_requirement_id, relation.source_requirement_id, relation_type=relation.relation_type.value)
     affected = []
     for direction, directed_graph in (("forward", graph), ("backward", graph.reverse(copy=False))):
         for identifier, (distance, path) in _walk(directed_graph, selected.id).items():
