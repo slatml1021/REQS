@@ -7,6 +7,8 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
 DEFAULT_DATABASE_URL = "postgresql+psycopg://reqs:reqs@localhost:5432/reqs"
+# PostgreSQL is the approved default. MySQL is available for 2209-A compatibility
+# validation through DATABASE_URL=mysql+pymysql://reqs:reqs@localhost:3307/reqs.
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 

@@ -8,7 +8,8 @@
 | Planlanan teknoloji | Uygulamadaki durum |
 | --- | --- |
 | Python 3, FastAPI | Uygun |
-| PostgreSQL, SQLAlchemy, Alembic | Uygun; Docker servisi PostgreSQL 16, migration zinciri aktif |
+| PostgreSQL, SQLAlchemy, Alembic | Uygun; PostgreSQL 16 ana Docker servisi ve migration zinciri aktif |
+| MySQL | 2209-A başvurusundaki araştırma olanağı seçeneği olarak ayrı uyumluluk profili eklendi. PostgreSQL'in yerine geçmez. |
 | NumPy ile AHP | Uygun; Saaty özdeğer ve CR hesaplaması |
 | NetworkX | Uygun; değişiklik etki analizi yönlü çoklu ilişki grafiği üzerinden yürür |
 | Jinja2, Bootstrap | Uygun |

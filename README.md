@@ -17,4 +17,13 @@ TÜBİTAK 2209-A bitirme tezi kapsamında geliştirilen karar destek sistemi.
 
 Varsayılan bağlantı adresi yerel PostgreSQL'dir. Testler, harici bir veritabanına ihtiyaç duymamak için geçici SQLite veritabanı kullanır.
 
+## MySQL uyumluluk profili
+
+2209-A başvurusunda yer alan MySQL seçeneği için ikinci servis de tanımlıdır. PostgreSQL ana geliştirme veritabanı olarak kalır; MySQL aynı migration zincirini doğrulamak için ayrı çalıştırılır.
+
+```bash
+docker compose up -d mysql
+DATABASE_URL=mysql+pymysql://reqs:reqs@localhost:3307/reqs alembic upgrade head
+```
+
 Ayrıntılı akış için [kullanım kılavuzuna](docs/KULLANIM_KILAVUZU.md) bakın.

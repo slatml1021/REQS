@@ -17,11 +17,15 @@ depends_on = None
 
 
 def upgrade() -> None:
-    relation_type = postgresql.ENUM("DEPENDS_ON", "PREREQUISITE_OF", "REFINES", "RELATED_TO", name="relation_type", create_type=False)
-    priority_method = postgresql.ENUM("AHP", "WIEGERS", "VOLERE", name="priority_method", create_type=False)
     bind = op.get_bind()
-    relation_type.create(bind, checkfirst=True)
-    priority_method.create(bind, checkfirst=True)
+    if bind.dialect.name == "postgresql":
+        relation_type = postgresql.ENUM("DEPENDS_ON", "PREREQUISITE_OF", "REFINES", "RELATED_TO", name="relation_type", create_type=False)
+        priority_method = postgresql.ENUM("AHP", "WIEGERS", "VOLERE", name="priority_method", create_type=False)
+        relation_type.create(bind, checkfirst=True)
+        priority_method.create(bind, checkfirst=True)
+    else:
+        relation_type = sa.String(length=32)
+        priority_method = sa.String(length=32)
     op.create_table(
         "requirements",
         sa.Column("id", sa.Integer(), primary_key=True),
@@ -72,5 +76,6 @@ def downgrade() -> None:
     op.drop_index("ix_requirements_key", table_name="requirements")
     op.drop_table("requirements")
     bind = op.get_bind()
-    sa.Enum(name="priority_method").drop(bind, checkfirst=True)
-    sa.Enum(name="relation_type").drop(bind, checkfirst=True)
+    if bind.dialect.name == "postgresql":
+        sa.Enum(name="priority_method").drop(bind, checkfirst=True)
+        sa.Enum(name="relation_type").drop(bind, checkfirst=True)

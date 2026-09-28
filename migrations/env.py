@@ -1,6 +1,7 @@
 """Alembic environment for REQS database revisions."""
 
 from logging.config import fileConfig
+import os
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -10,6 +11,8 @@ import app.models  # noqa: F401 - imports models into Base.metadata
 
 
 config = context.config
+if database_url := os.getenv("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", database_url)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
