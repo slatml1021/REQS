@@ -74,7 +74,7 @@ literature/          Yerel tam metin arşivi ve kaynak denetimi
 - [İzlenebilirlik ve etki analizi](docs/IZLENEBILIRLIK_VE_ETKI_ANALIZI.md), [vaka çalışması](docs/VAKA_CALISMASI.md)
 - [Görev dağılımı](docs/GOREV_DAGILIMI.md), [takvim](docs/CALISMA_TAKVIMI.md), [uygunluk denetimi](docs/GOREV_UYUMLULUK_DENETIMI.md)
 - [Literatür taraması](docs/LITERATUR_TARAMASI.md), [kullanıcı kılavuzu](docs/KULLANICI_KILAVUZU.md), [teslim kontrolü](docs/TUBITAK_2209A_BASVURU_KONTROL_LISTESI.md)
-- [Kaynak belgeler envanteri](docs/KAYNAK_BELGELER.md) ve [vaka PDF raporu](reports/reqs-vaka-raporu.pdf)
+- [Kaynak belgeler envanteri](docs/KAYNAK_BELGELER.md), [vaka PDF raporu](reports/reqs-vaka-raporu.pdf) ve [Word teslim raporu](reports/REQS_Teslim_Raporu.docx)
 
 ## Dürüst kanıt sınırı
 
