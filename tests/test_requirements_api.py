@@ -170,6 +170,53 @@ def test_traceability_direction_queries_are_empty_for_unknown_requirement():
     assert client.get("/api/v1/traceability/REQ-999/backward").json()["relations"] == []
 
 
+def test_ahp_calculation_persists_consistent_priorities():
+    first = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    second = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    assert client.put("/api/v1/ahp/comparisons", json={"left_requirement_id": first, "right_requirement_id": second, "comparison_value": "3"}).status_code == 200
+
+    result = client.post("/api/v1/ahp/comparisons/calculate")
+
+    assert result.status_code == 200
+    assert result.json()["is_consistent"] is True
+    assert result.json()["results"][0]["requirement_key"] == "REQ-001"
+    assert client.get("/api/v1/prioritization/results").json()[0]["method"] == "ahp"
+
+
+def test_wiegers_batch_calculates_comparable_scores():
+    first = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    second = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    response = client.put("/api/v1/wiegers/scores", json={"weights": {"benefit": 1, "penalty": 1, "cost": 1, "risk": 1}, "assessments": [{"requirement_id": first, "benefit": 9, "penalty": 9, "cost": 1, "risk": 1}, {"requirement_id": second, "benefit": 1, "penalty": 1, "cost": 9, "risk": 9}]})
+
+    assert response.status_code == 200
+    assert response.json()[0]["requirement_key"] == "REQ-001"
+    assert response.json()[0]["normalized_score"] == 100.0
+
+
+def test_relation_crud_and_transitive_impact_analysis():
+    first = client.post("/api/v1/requirements", json={"key": "REQ-001", "title": "Giriş"}).json()["id"]
+    second = client.post("/api/v1/requirements", json={"key": "REQ-002", "title": "Rapor"}).json()["id"]
+    third = client.post("/api/v1/requirements", json={"key": "REQ-003", "title": "Bildirim"}).json()["id"]
+    for source, target in ((first, second), (second, third)):
+        assert client.post("/api/v1/relations", json={"source_requirement_id": source, "target_requirement_id": target, "relation_type": "depends_on"}).status_code == 201
+
+    impact = client.get("/api/v1/impact-analysis/REQ-001")
+
+    assert impact.status_code == 200
+    assert [(item["key"], item["distance"]) for item in impact.json()["affected_requirements"]] == [("REQ-002", 1), ("REQ-003", 2)]
+    relation_id = client.get("/api/v1/relations").json()[0]["id"]
+    assert client.delete(f"/api/v1/relations/{relation_id}").status_code == 204
+
+
+def test_core_screens_and_pdf_export_are_available():
+    for path in ("/", "/wiegers/scoring", "/traceability/matrix", "/impact-analysis"):
+        assert client.get(path).status_code == 200
+    pdf = client.get("/api/v1/reports/pdf")
+    assert pdf.status_code == 200
+    assert pdf.headers["content-type"].startswith("application/pdf")
+    assert pdf.content.startswith(b"%PDF")
+
+
 def test_prioritization_dashboard_links_results_to_traceability_graph():
     response = client.get("/prioritization/dashboard")
 

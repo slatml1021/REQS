@@ -67,6 +67,8 @@
             <button type="submit" class="btn btn-primary">Karşılaştırmayı kaydet</button>
           </div>
           <div id="save-status" class="mt-3 small" role="status" aria-live="polite"></div>
+          <button type="button" id="calculate-ahp" class="btn btn-outline-primary mt-3">AHP sonuçlarını hesapla</button>
+          <div id="calculate-status" class="mt-2 small" role="status" aria-live="polite"></div>
         </div>
       </form>
       {% endif %}
@@ -108,6 +110,16 @@
             status.className = "mt-3 small text-danger";
             status.textContent = "Sunucuya ulaşılamadı; bağlantıyı kontrol edip tekrar dene.";
           }
+        });
+      }
+      const calculate = document.getElementById("calculate-ahp");
+      if (calculate) {
+        calculate.addEventListener("click", async () => {
+          const status = document.getElementById("calculate-status");
+          const response = await fetch("/api/v1/ahp/comparisons/calculate", { method: "POST" });
+          const result = await response.json();
+          status.className = "mt-2 small " + (response.ok ? "text-success" : "text-danger");
+          status.textContent = response.ok ? `Hesaplandı. Tutarlılık oranı: ${result.consistency_ratio.toFixed(3)}${result.is_consistent ? " (uygun)" : " (0,10 üstü; karşılaştırmaları gözden geçir)"}.` : (result.detail?.message || "Önce tüm ikili karşılaştırmaları kaydet.");
         });
       }
     </script>
